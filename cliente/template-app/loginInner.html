@@ -1,0 +1,23 @@
+<html>
+<body>
+  <H1>Hidden window</H1>
+</body>
+<script type="text/javascript">
+  const ipc = require('electron').ipcRenderer
+  const BrowserWindow = require('electron').remote.BrowserWindow
+
+  ipc.on('try-connect', function (event, id, pass, fromWindowId) {
+    const result = connect(id,pass)
+    const fromWindow = BrowserWindow.fromId(fromWindowId)
+    fromWindow.webContents.send('login-result', result)
+    window.close()
+  })
+
+  function connect (id, pass) {
+    //ipc.send('open-error-dialog',"User info",`${id},${pass}`)
+      return true;
+  }
+
+
+</script>
+</html>

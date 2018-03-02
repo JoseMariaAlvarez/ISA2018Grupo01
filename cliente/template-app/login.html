@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Photon</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../css/photon.min.css">
+    <link rel="stylesheet" href="../css/own.css">
+    <!-- Javascript -->
+    <script src="js/menu.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <H1 style="text-align:center;height:20%">Medical App</H1>
+    <div id="loginDiv">
+
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="email" class="form-control" id="userNamePrompt" placeholder="Email">
+      </div>
+      <div class="form-group">
+        <label>Contraseña </label>
+        <input type="password" class="form-control" id="passwordPrompt" placeholder="Password">
+        <hr>
+        <div class="wrapper" style="text-align:center;">
+        <button class="btn btn-large btn-positive" style="align:center">Conectar</button>
+      </div>
+      </div>
+  </div>
+  <script>
+    const BrowserWindow = require('electron').remote.BrowserWindow
+    const ipcRenderer = require('electron').ipcRenderer
+    const path = require('path')
+    const buttonConnect = document.getElementsByClassName('btn btn-large btn-positive');
+    buttonConnect[0].addEventListener('click', connect);
+    function connect(){
+      userName=document.getElementById("userNamePrompt").value
+      password=document.getElementById("passwordPrompt").value
+      buttonConnect[0].innerHTML = "Conectando...";
+      buttonConnect[0].disabled = true;
+      buttonConnect[0].style.background='#969696';
+      buttonConnect[0].style.borderColor="#969696"
+      ipcRenderer.send('do-login',userName,password)
+      const windowID = BrowserWindow.getFocusedWindow().id
+      const invisPath = 'file://' + path.join(__dirname, 'loginInner.html')
+      let win = new BrowserWindow({ width: 400, height: 400, show: false })
+      win.loadURL(invisPath)
+      win.webContents.on('did-finish-load', function () {
+        win.webContents.send('try-connect', document.getElementById("userNamePrompt").value, document.getElementById("passwordPrompt").value, windowID)
+      })
+      ipcRenderer.on('login-result', function (event, res) {
+        if (res==true){
+          const mainPath = 'file://' + path.join(__dirname, 'index.html')
+          let mainWin = new BrowserWindow({ width: 1000, height: 600, show: true })
+          mainWin.loadURL(mainPath)
+          window.close();
+        }else{
+
+        }
+      })
+    }
+
+
+  </script>
+  </body>
+</html>
